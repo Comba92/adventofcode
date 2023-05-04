@@ -35,26 +35,23 @@ class Grid<T> {
     return this.grid[p.y][p.x]
   }
 
-  getLike(value: T): number {
-    let count = 0
-    for(let y=0; y<this.size; ++y) {
-      for(let x=0; x<this.size; ++x) {
-        count += this.get({x, y}) === value ? 1 : 0
+  [Symbol.iterator]() {
+    let x = 0
+    let y = 0
+
+    return {
+      next: () => {
+        const value = this.get({x, y})
+        x += 1
+        if (x === this.size) {
+          x = 0
+          y += 1
+        }
+
+        const done = y === this.size
+        return { value, done }
       }
     }
-
-    return count
-  }
-
-  getSum(): number {
-    let sum = 0
-    for(let y=0; y<this.size; ++y) {
-      for(let x=0; x<this.size; ++x) {
-        sum += Number(this.get({x, y}))
-      }
-    }
-
-    return sum
   }
 
   set(p: Point, value: T) {
@@ -120,7 +117,12 @@ function solver1(input: string): number {
     grid.rect(instruction)
   }
 
-  return grid.getLike(true)
+  let litCount = 0
+  for(const light of grid) {
+    if (light) litCount++
+  }
+
+  return litCount
 }
 
 function solver2(input: string): number {
@@ -136,7 +138,12 @@ function solver2(input: string): number {
     grid.rect(instruction)
   }
 
-  return grid.getSum()
+  let totalBrightness = 0
+  for (const light of grid) {
+    totalBrightness += light
+  }
+
+  return totalBrightness
 }
 
 import execute from './handler'

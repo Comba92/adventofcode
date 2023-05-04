@@ -1,2 +1,4 @@
+function solver(input: string) {}
+
 import execute from './handler'
-execute(, 'day22.txt')
+execute(solver, 'day22.txt')
