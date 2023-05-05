@@ -35,24 +35,6 @@ class Grid<T> {
     return this.grid[p.y][p.x]
   }
 
-  [Symbol.iterator]() {
-    let x = 0
-    let y = 0
-
-    return {
-      next: () => {
-        const value = this.get({x, y})
-        x += 1
-        if (x === this.size) {
-          x = 0
-          y += 1
-        }
-
-        const done = y === this.size
-        return { value, done }
-      }
-    }
-  }
 
   set(p: Point, value: T) {
     this.grid[p.y][p.x] = value
@@ -118,9 +100,9 @@ function solver1(input: string): number {
   }
 
   let litCount = 0
-  for(const light of grid) {
-    if (light) litCount++
-  }
+  for(const row of grid.grid) 
+    for(const light of row) 
+      if (light) litCount++
 
   return litCount
 }
@@ -139,9 +121,9 @@ function solver2(input: string): number {
   }
 
   let totalBrightness = 0
-  for (const light of grid) {
-    totalBrightness += light
-  }
+  for(const row of grid.grid) 
+    for(const light of row) 
+      totalBrightness += light
 
   return totalBrightness
 }

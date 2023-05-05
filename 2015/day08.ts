@@ -12,11 +12,20 @@ function countCharsOfData(s: string): number {
   return charsCount
 }
 
-function charIsDigit(c: string): boolean {
-  return !Number.isNaN(Number(c))
+function encode(s: string): string {
+  let ns = ''
+  for (const c of s) {
+    switch(c) {
+      case '"': ns += '\\"'; break
+      case '\\': ns += '\\\\'; break
+      default: ns += c
+    }
+  }
+
+  return '"' + ns + '"'
 }
 
-function solver(input: string) {
+function solver1(input: string) {
   let sum = 0
   
   for (const line of input.split('\r\n')) {
@@ -26,5 +35,15 @@ function solver(input: string) {
   return sum
 }
 
+function solver2(input: string) {
+  let sum = 0
+  
+  for (const line of input.split('\r\n')) {
+    sum += encode(line).length - line.length
+  }
+
+  return sum
+}
+
 import execute from './handler'
-execute(solver, 'day08.txt')
+execute(solver2, 'day08.txt')

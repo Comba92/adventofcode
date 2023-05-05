@@ -1,0 +1,21 @@
+Day 01. Linear string parsing
+Day 02. Linear with single costant math formula
+Day 03. Linear + HashMap
+Day 04. Bruteforcing MD5 hashing function
+Day 05. Linear string parsing -- part 2 not solved
+Day 06. Rect drawing on grid, simulation
+Day 07. Instructions interpreter, bruteforcing -- maybe can do better with graphs?
+Day 08. Linear string parsing
+Day 09. not solved
+Day 10. Look-and-say game, simulation
+Day 11. Linear string parsing, bruteforcing
+Day 12. Linear string parsing
+Day 13. not solved
+Day 14. Part 1 Linear with costant math formula, Part 2 with simulation
+Day 15. not solved
+Day 16. Linear with "is subset of" algorithm
+Day 17. Factorial recursive solution -- maybe can do better with greedy or DP?
+Day 18. Game of Life, simulation
+Day 19. not solved
+Day 20. Find divisors algorithm, radical time, bruteforcing
+Day 21. 
