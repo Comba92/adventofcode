@@ -1,14 +1,12 @@
-interface Stats {
+export interface Stats {
   hp: number,
   damage: number,
   armor: number
 }
 
-type Type = 'Weapons' | 'Armor' | 'Rings'
-
 interface Item {
   name: string,
-  type: Type,
+  type: string,
   cost: number,
   damage: number,
   armor: number
@@ -36,11 +34,24 @@ function parseItems(input: string): Item[] {
   return items
 }
 
-function canKillBoss(player: Stats, boss: Stats): boolean {
+function computeRingsCombinations(rings: Item[]) {
+  let combinations: [Item,Item][] = []
+
+  for(let i=0; i<rings.length; ++i) {
+    for(let j=i+1; j<rings.length; ++j) {
+      combinations.push([rings[i], rings[j]])
+    }
+  }
+
+  return combinations
+}
+
+
+export function canKillBoss(player: Stats, boss: Stats): boolean {
   const playerDmg = Math.max(player.damage - boss.armor, 1)
   const bossDmg = Math.max(boss.damage - player.armor, 1)
 
-  return Math.floor(boss.hp / playerDmg) <= Math.floor(player.hp / bossDmg)
+  return Math.ceil(boss.hp / playerDmg) <= Math.ceil(player.hp / bossDmg)
 }
 
 /* 
@@ -53,21 +64,80 @@ function canKillBoss(player: Stats, boss: Stats): boolean {
   Kill the boss and minimize the gold
 */
 
-function solver(input: string) {
+let playerStats: Stats = {
+  hp: 100, damage: 0, armor: 0
+}
+
+const bossStats: Stats = {
+  hp: 104, damage: 8, armor: 1
+}
+
+
+function minAmountOfGoldToWin(weapons: Item[], armors: Item[], ringsPairs: [Item,Item][]) {
+  let minGoldSpent = Number.MAX_SAFE_INTEGER
+  for(const weapon of weapons) {
+    for(const armor of armors) {
+      for(const pair of ringsPairs) {
+        let player: Stats = {
+          hp: playerStats.hp, damage: weapon.damage, armor: armor.armor
+        }
+        let goldSpent = weapon.cost + armor.cost
+
+        for(const ring of pair) {
+          player.damage += ring.damage
+          player.armor += ring.armor
+          goldSpent += ring.cost
+        }
+
+        if (canKillBoss(player, bossStats))
+          minGoldSpent = Math.min(goldSpent, minGoldSpent)
+      }
+    }
+  }
+
+  return minGoldSpent
+}
+
+function maxAmountOfGoldToLose(weapons: Item[], armors: Item[], ringsPairs: [Item,Item][]) {
+  let maxGoldSpent = 0
+  for(const weapon of weapons) {
+    for(const armor of armors) {
+      for(const pair of ringsPairs) {
+        let player: Stats = {
+          hp: playerStats.hp, damage: weapon.damage, armor: armor.armor
+        }
+        let goldSpent = weapon.cost + armor.cost
+
+        for(const ring of pair) {
+          player.damage += ring.damage
+          player.armor += ring.armor
+          goldSpent += ring.cost
+        }
+
+        if (!canKillBoss(player, bossStats))
+          maxGoldSpent = Math.max(goldSpent, maxGoldSpent)
+      }
+    }
+  }
+
+  return maxGoldSpent
+}
+
+function solver(input: string, condition: (weapons: Item[], armors: Item[], ringsPairs: [Item,Item][]) => number) {
   const items = parseItems(input)
+  items.push(
+    {name: 'None', type: 'Armor', cost: 0, damage: 0, armor: 0},
+    {name: 'None Left', type: 'Rings', cost: 0, damage: 0, armor: 0},
+    {name: 'None Right', type: 'Rings', cost: 0, damage: 0, armor: 0}
+  )
+
   const weapons = items.filter(i => i.type === 'Weapons')
-  const armor = items.filter(i => i.type === 'Armor')
+  const armors = items.filter(i => i.type === 'Armor')
   const rings = items.filter(i => i.type === 'Rings')
+  const ringsPairs = computeRingsCombinations(rings)
 
-  let playerStats: Stats = {
-    hp: 100, damage: 0, armor: 0
-  }
-  let bossStats: Stats = {
-    hp: 104, damage: 8, armor: 1
-  }
-
-  let goldSpent = 0
+  return condition(weapons, armors, ringsPairs)
 }
 
 import execute from './handler'
-execute(solver, 'day21.txt')
+execute((input) => solver(input, maxAmountOfGoldToLose), 'day21.txt')
