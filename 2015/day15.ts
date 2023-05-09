@@ -31,53 +31,9 @@ function getIngredients(input: string) {
   return ingredients
 }
 
-function computeSubsets<T>(list: T[], size: number) {
-  function backtrack(curr: number, size: number) {
-    if (size <= 0) return [[]]
-
-    let subsets: T[][] = []
-    for (let i = curr+1; i < list.length; i++) {
-      const subset = backtrack(i, size-1)
-      for (const p of subset)
-        subsets.push([list[i], ...p])
-    }
-  
-    return subsets
-  }
-
-  return backtrack(-1, size)
-}
-
-function computePermutations<T>(list: T[]) { 
-  let perms: T[][] = []
-
-  function backtrack(sublist: T[]) {
-    if (sublist.length === list.length) {
-      perms.push(sublist)
-      return 
-    }
-
-    for (let i = 0; i < list.length; i++) {
-      if (sublist.includes(list[i])) continue
-      sublist.push(list[i])
-      backtrack([...sublist])
-      sublist.pop()
-    }
-  }
-
-  backtrack([])
-  return perms
-}
-
-function range(a: number, b: number) {
-  let r: number[] = []
-  for (let i=a; i<=b; i++) {
-    r.push(i)
-  }
-  return r
-}
 
 const MAX_INGREDIENTS = 100
+import { computeSubsets, computePermutations, range } from './utils'
 
 function solver1(input: string) {
   const ingredients = getIngredients(input)

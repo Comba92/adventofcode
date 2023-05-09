@@ -7,28 +7,7 @@ function parseLine(line: string) {
   return {src, dst, weight}
 }
 
-
-function computePermutations<T>(list: T[]) { 
-  let perms: T[][] = []
-
-  function backtrack(sublist: T[]) {
-    if (sublist.length === list.length) {
-      perms.push(sublist)
-      return 
-    }
-
-    for (let i = 0; i < list.length; i++) {
-      if (sublist.includes(list[i])) continue
-      sublist.push(list[i])
-      backtrack([...sublist])
-      sublist.pop()
-    }
-  }
-
-  backtrack([])
-  return perms
-}
-
+import { computePermutations } from './utils'
 
 function solver(input: string) {
   let cities = new Set<string>()

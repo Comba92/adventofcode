@@ -8,44 +8,7 @@ function parseLine(line: string) {
   return {src, dst, weight}
 }
 
-// https://stackoverflow.com/questions/52356091/recursive-algorithm-to-generate-all-permutations-of-length-k-of-a-list-in-python
-function computeSubsets<T>(list: T[], size: number) {
-  function backtrack(curr: number, size: number) {
-    if (size <= 0) return [[]]
-
-    let subsets: T[][] = []
-    for (let i = curr+1; i < list.length; i++) {
-      const subset = backtrack(i, size-1)
-      for (const p of subset)
-        subsets.push([list[i], ...p])
-    }
-  
-    return subsets
-  }
-
-  return backtrack(-1, size)
-}
-
-function computePermutations<T>(list: T[]) { 
-  let perms: T[][] = []
-
-  function backtrack(sublist: T[]) {
-    if (sublist.length === list.length) {
-      perms.push(sublist)
-      return 
-    }
-
-    for (let i = 0; i < list.length; i++) {
-      if (sublist.includes(list[i])) continue
-      sublist.push(list[i])
-      backtrack([...sublist])
-      sublist.pop()
-    }
-  }
-
-  backtrack([])
-  return perms
-}
+import { computePermutations } from './utils'
 
 function solver(input: string) {
   let people = new Set<string>()
@@ -87,8 +50,6 @@ function solver(input: string) {
     maxHappiness = Math.max(maxHappiness, happines) 
   }
 
-
-  // TOO LOW!
   return maxHappiness
 }
 

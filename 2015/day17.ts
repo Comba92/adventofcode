@@ -46,15 +46,42 @@ function countMinCombinationsFrom(arr: number[], current: number, target: number
   return countCombinationsWithMaxDepthFrom(arr, current, target, minCombination)
 }
 
-function solver(input: string, counter: SetPartitionFunction) {
+function solverOptimized(input: string, counter: SetPartitionFunction) {
   let containers: number[] = []
   for (const line of input.split('\n')) {
     containers.push( Number(line) )
   }
 
-  containers.sort((a,b) => a-b)
   return counter(containers, -1, TOTAL_LITERS)
 }
 
+
+import {computeSubsetsWithSum} from './utils'
+
+function solver1(input: string) {
+  let containers: number[] = []
+  for (const line of input.split('\n')) {
+    containers.push( Number(line) )
+  }
+
+  const combinations = computeSubsetsWithSum(containers, TOTAL_LITERS)
+  return combinations.length
+}
+
+function solver2(input: string) {
+  let containers: number[] = []
+  for (const line of input.split('\n')) {
+    containers.push( Number(line) )
+  }
+
+  const combinations = computeSubsetsWithSum(containers, TOTAL_LITERS)
+  let minContainers = Number.MAX_SAFE_INTEGER
+  for(const comb of combinations)
+    minContainers = Math.min(minContainers, comb.length)
+
+  return combinations.filter(comb => comb.length === minContainers).length
+}
+
+
 import execute from './handler'
-execute((input) => solver(input, countMinCombinationsFrom), 'day17.txt')
+execute((input) => solverOptimized(input, countMinCombinationsFrom), 'day17.txt')
