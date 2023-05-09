@@ -155,15 +155,15 @@ function getMinManaSpent(s: State, turn=1): number {
     let newS = {...s}
 
     newS = nextState(newS, chosenSpell)
-    if (newS.boss.hp <= 0) console.log('boss dead')
-    else debug(newS, chosenSpell, turn)
-    if (newS.player.hp <= 0) return Number.MAX_SAFE_INTEGER
+/*     if (newS.boss.hp <= 0) console.log('boss dead')
+    else debug(newS, chosenSpell, turn) */
+    if (newS.player.hp <= 0 || newS.player.mana <= 0) return Number.MAX_SAFE_INTEGER
     if (newS.boss.hp <= 0) return 0
 
     newS = nextState(newS, bossAttack)
-    if (newS.player.hp <= 0) console.log('player dead')
-    else debug(newS, bossAttack, turn+1)
-    if (newS.player.hp <= 0) return Number.MAX_SAFE_INTEGER
+/*     if (newS.player.hp <= 0 || newS.player.mana <= 0) console.log('player dead')
+    else debug(newS, bossAttack, turn+1) */
+    if (newS.player.hp <= 0 || newS.player.mana <= 0) return Number.MAX_SAFE_INTEGER
     if (newS.boss.hp <= 0) return 0
 
     const manaSpent = chosenSpell.cost + getMinManaSpent(newS, turn+2)

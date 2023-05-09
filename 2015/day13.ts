@@ -56,11 +56,6 @@ function solver(input: string) {
     people.add(route.src)
     people.add(route.dst)
 
-/*     const edge = [route.src, route.dst].sort().join('')
-    const weight = graph.get(edge)
-    if (weight) graph.set(edge, weight + route.weight)
-    else graph.set(edge, route.weight) */
-
     const hash1 = route.src+route.dst
     const weight1 = graph.get(hash1)
     if (weight1) graph.set(hash1, weight1 + route.weight)
@@ -70,10 +65,6 @@ function solver(input: string) {
     const weight2 = graph.get(hash2)
     if (weight2) graph.set(hash2, weight2 + route.weight)
     else graph.set(hash2, route.weight) 
-
-/*     const edge = graph.get(route.src)
-    if (edge) graph.set(route.src, edge.concat([[route.dst, route.weight]]))
-    else graph.set(route.src, [[route.dst, route.weight]]) */
   }
 
   for(const person of people) {

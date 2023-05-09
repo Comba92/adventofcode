@@ -20,24 +20,10 @@ function isNiceString1(s: string): boolean {
 
 function hasPairOf2RepeatedNonOverlappingChars(s: string): boolean {
   let pairs = new Set<string>()
-  let lastPair = ''
   for(let i=0; i<s.length-1; ++i) {
     const pair = s[i] + s[i+1]
 
-    // check if i already seen it
-    if (pairs.has(pair)) {
-      // if i have seen it and they are the same
-      if (s[i] === s[i+1]) {
-        // if they don't overlap, they are a correct pair
-        if (s[i+1] !== s[i+2]) return true
-      // if i have seen it and they aren't the same,  they are a correct pair
-      } else return true
-
-    // if i haven't seen it, add it to the set and update the last seen
-    } else {
-      pairs.add(pair)
-      lastPair = pair
-    }
+    if (s.substring(i+2).includes(pair)) return true
   }
 
   return false
@@ -61,7 +47,7 @@ function isNiceString2(s: string): boolean {
 
 function solver(input: string, isNiceString: (s: string) => boolean) {
   let niceStringsCount = 0
-  for(const line of input.split('\n')) {
+  for(const line of input.split('\r\n')) {
     niceStringsCount += isNiceString(line) ? 1 : 0
   }
   return niceStringsCount
