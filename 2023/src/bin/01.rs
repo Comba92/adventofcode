@@ -22,7 +22,6 @@ const NUMS: [(&str, u32); 20] = [
 ];
 
 fn main() {
-  include!()
   let input = String::from(include_str!("01.txt"));
 
   let result = input.lines()
