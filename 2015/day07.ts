@@ -88,44 +88,5 @@ function solver(input: string) {
   return wires.get('a')
 }
 
-function solverOptimized(input: string) {
-  let wires = new Map<string, number>()
-  let instructionsLeft: Set<string> = new Set()
-  let graph = new Map<string, string[]>()
-
-  for (const line of input.split('\r\n')) {
-    instructionsLeft.add(line)
-  }
- 
-  while(instructionsLeft.size > 0) {
-    for(const line of instructionsLeft) {
-      try {
-        emulateLine(line, wires)
-        instructionsLeft.delete(line)
-      } catch(e) { }
-    }
-  }
-
-  const aSignal = wires.get('a')
-  wires.clear()
-  if (aSignal !== undefined) wires.set('b', aSignal)
-  
-  for (const line of input.split('\r\n')) {
-    instructionsLeft.add(line)
-  }
-  instructionsLeft.add(aSignal + ' -> b')
- 
-  while(instructionsLeft.size > 0) {
-    for(const line of instructionsLeft) {
-      try {
-        emulateLine(line, wires)
-        instructionsLeft.delete(line)
-      } catch(e) { continue }
-    }
-  }
-
-  return wires.get('a')
-}
-
 import execute from './handler'
 execute(solver, 'day07.txt')
