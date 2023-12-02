@@ -1,6 +1,5 @@
 fn main() {
-  // let input = String::from(include_str!("01-a.txt"));
-  let input = String::from(include_str!("01-b.txt"));
+  let input = String::from(include_str!("01.txt"));
 
   let time = std::time::SystemTime::now();
   let result = input.lines()
@@ -35,6 +34,6 @@ fn main() {
     });
 
 
-  println!("{:?}", time.elapsed().unwrap().as_nanos());
+  println!("{:?}", time.elapsed().unwrap());
   print!("{result}");
 }
