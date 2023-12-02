@@ -50,6 +50,7 @@ fn main() {
       games.push(maxes);
   });
 
+  #[allow(unused)]
   let result1: usize = games.iter()
     .enumerate()
     .filter(|game| {

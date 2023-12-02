@@ -1,29 +1,35 @@
-#[derive(Clone, Copy)]
-enum Opponent {
-  Rock = 'A' as isize, Paper = 'B' as isize, Scissors = 'C' as isize
-}
+#[allow(dead_code)]
 
-#[derive(Clone, Copy)]
-enum Player {
-  Rock = 'X' as isize, Paper = 'Y' as isize, Scissors = 'Z' as isize
-}
-
-
-fn fight(opponent: &Opponent, player: &Player) -> i32 {
-  match (&opponent, &player) {
-    (Opponent::Rock, Player::Rock)     => 3 + *player as i32,
-    (Opponent::Rock, Player::Paper)    => 6 + *player as i32,
-    (Opponent::Rock, Player::Scissors) => 0 + *player as i32,
-
-    (Opponent::Paper, Player::Paper)    => 3 + *player as i32,
-    (Opponent::Paper, Player::Rock)     => 0 + *player as i32,
-    (Opponent::Paper, Player::Scissors) => 6 + *player as i32,
-
-    (Opponent::Scissors, Player::Scissors) => 3 + *player as i32,
-    (Opponent::Scissors, Player::Rock)     => 6 + *player as i32,
-    (Opponent::Scissors, Player::Paper)    => 0 + *player as i32,
+fn fight_1(opponent: char, player: char) -> u32 {
+  match (opponent, player) {
+    ('A', 'X') => 3 + 1,
+    ('A', 'Y') => 6 + 2,
+    ('A', 'Z') => 0 + 3,
+    ('B', 'Y') => 3 + 2,
+    ('B', 'X') => 0 + 1,
+    ('B', 'Z') => 6 + 3,
+    ('C', 'Z') => 3 + 3,
+    ('C', 'X') => 6 + 1,
+    ('C', 'Y') => 0 + 2,
+    _ => panic!("shouldnt happen")
   }
 }
+
+fn fight_2(opponent: char, player: char) -> u32 {
+  match (opponent, player) {
+    ('A', 'X') => 0 + 3,
+    ('A', 'Y') => 3 + 1,
+    ('A', 'Z') => 6 + 2,
+    ('B', 'X') => 0 + 1,
+    ('B', 'Y') => 3 + 2,
+    ('B', 'Z') => 6 + 3,
+    ('C', 'X') => 0 + 2,
+    ('C', 'Y') => 3 + 3,
+    ('C', 'Z') => 6 + 1,
+    _ => panic!("shouldnt happen")
+  }
+}
+
 
 fn main() {
   let input = String::from(include_str!("02.txt"));  
@@ -34,7 +40,7 @@ fn main() {
     let opponent = moves[0].chars().nth(0).unwrap();
     let player = moves[1].chars().nth(0).unwrap();
 
-    let points = fight(&opponent, &player);
+    let points = fight_2(opponent, player);
 
     score + points
   });
