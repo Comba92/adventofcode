@@ -1,16 +1,21 @@
+#![allow(dead_code, unused)]
+
 fn count_and_color_to_tuple(s: &str) -> (usize, &str) {
-  let group = s
+  let mut group = s
   .split(' ')
-  .filter(|token| token.len() != 0)
-  .collect::<Vec<_>>();
+  .filter(|token| !token.is_empty());
   
-  (group[0].parse().unwrap(), group[1])
+  let count = group.next().unwrap().parse().unwrap();
+  let color = group.next().unwrap();
+  (count, color)
 }
 
+use std::fs;
 
 fn main() {
-  let input = String::from(include_str!("02.txt"));
+  let input = include_str!("02.txt");
 
+  let timer = std::time::SystemTime::now();
   let mut games = Vec::new();
 
   input.lines().for_each(|game| {
@@ -22,7 +27,6 @@ fn main() {
        
 
     let mut maxes = [0; 3];
-    let mut mins = [0; 3];
 
     extractions.iter().for_each(|extraction| {
       // split per cube
@@ -30,19 +34,10 @@ fn main() {
         .map(count_and_color_to_tuple)
         .for_each(|(quantity, color)| {
           match color {
-            "red" => {
-              maxes[0] = maxes[0].max(quantity);
-              mins[0] = mins[0].min(quantity);
-            },
-            "green" => {
-              maxes[1] = maxes[1].max(quantity);
-              mins[1] = mins[1].min(quantity);
-            },
-            "blue" => {
-              maxes[2] = maxes[2].max(quantity);
-              mins[2] = mins[2].min(quantity);
-            },
-            _ => panic!("shouldnt happen"),
+            "red" => maxes[0] = maxes[0].max(quantity),
+            "green" => maxes[1] = maxes[1].max(quantity),
+            "blue" => maxes[2] = maxes[2].max(quantity),
+            _ => unreachable!(),
           };
         });
       });
@@ -50,7 +45,6 @@ fn main() {
       games.push(maxes);
   });
 
-  #[allow(unused)]
   let result1: usize = games.iter()
     .enumerate()
     .filter(|game| {
@@ -63,5 +57,7 @@ fn main() {
     .map(|game| game.iter().product::<usize>())
     .sum();
 
+
+  println!("{:?}", timer.elapsed().unwrap());
   println!("{result2}");
 }

@@ -1,5 +1,5 @@
 fn main() {
-  let input = String::from(include_str!("01.txt"));
+  let input = include_str!("01.txt");
 
   let time = std::time::SystemTime::now();
   let result = input.lines()
