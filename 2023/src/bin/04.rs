@@ -1,13 +1,19 @@
-use std::collections::HashSet;
+use std::collections::{HashSet, HashMap};
 
-fn recursion(card: usize, matches: &Vec<usize>) -> usize {
+fn recursion(card: usize, matches: &Vec<usize>, memo: &mut HashMap<usize, usize>) -> usize {
   if card >= matches.len() { return 0 }
 
   let this_match = matches[card];
   let mut sum = 1;
 
-  for next in 0..this_match {
-    sum += recursion(card + next + 1, matches);
+  for next in 1..=this_match {
+    if let Some(cached) = memo.get(&(card + next)) {
+      sum += recursion(card + next, matches, memo)
+    } else {
+      let rec = recursion(card + next, matches, memo);
+      memo.insert(card + next, rec);
+      sum += rec;
+    }
   }
 
   sum
@@ -47,9 +53,10 @@ fn main() {
   });
 
 
+  let mut memoization: HashMap<usize, usize> = HashMap::new();
   let result2 = (0 .. matches_per_card.len())
     .fold(0, |sum, card| 
-      sum + recursion(card, &matches_per_card)
+      sum + recursion(card, &matches_per_card, &mut memoization)
     );
 
   println!("{:?}", timer.elapsed().unwrap());
