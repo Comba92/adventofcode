@@ -1,11 +1,8 @@
-use std::collections::HashSet;
-
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug)]
 struct NumberPart {
   value: u32,
   left: isize,
   right: isize,
-  row: usize,
   visited: bool,
 }
 
@@ -23,18 +20,26 @@ fn main() {
   let mut symbols_list = Vec::new();
 
   input.lines().enumerate().for_each(|(row, line)| {
-    let numbers: Vec<NumberPart> = line.split(|c: char| !c.is_ascii_digit())
-    .filter(|token| !token.is_empty())
-    // get indexes
-    .flat_map(|token| line.match_indices(token).collect::<Vec<(usize, &str)>>())
-    // remove duplicates
-    .collect::<HashSet<(usize, &str)>>().iter()
-    .map(|&(idx, part)| {
-      let left = idx as isize;
-      let right = (idx + part.len() - 1) as isize;
-      let value = part.parse().unwrap();
-      NumberPart {left, right, value, row, visited: false}
-    }).collect();
+    let mut tmp_str = String::new();
+    let mut numbers = Vec::new();
+
+    line.char_indices().for_each(|(i, c)| {
+      if c.is_digit(10) {
+        tmp_str.push(c);
+      } 
+      
+      if (!c.is_ascii_digit() || i >= line.len()-1) && !tmp_str.is_empty() {
+        let value = tmp_str.parse().unwrap();
+        let right = i as isize - 1;
+        let left = right - tmp_str.len() as isize + 1;
+
+        let part = NumberPart {
+          left, right, value, visited: false
+        };
+        numbers.push(part);
+        tmp_str.clear();
+      }
+    });
 
     numbers_list.push(numbers);
 
@@ -45,7 +50,7 @@ fn main() {
     }).for_each(|part| symbols_list.push(part));
   });
 
-  let result = symbols_list.iter().fold(0, |sum, symbol| {
+  let result1 = symbols_list.iter().fold(0, |sum, symbol| {
     let mut row_sum = 0;
     
     for offset in [-1, 0, 1] {
@@ -64,7 +69,25 @@ fn main() {
     sum + row_sum
   });
 
-  println!("{:?}", numbers_list);
-  println!("{:?}", symbols_list);
-  println!("{result}");
+  let result2 = symbols_list.iter()
+  .filter(|symbol| symbol.value == '*')
+  .fold(0, |sum, symbol| {    
+    let mut numbers = Vec::new();
+    
+    for offset in [-1, 0, 1] {
+      let probable_row = numbers_list.get((symbol.row + offset) as usize);
+      if probable_row.is_none() { continue }
+ 
+      probable_row.unwrap().iter()
+      .filter(|num| 
+        num.left - 1 <= symbol.idx && symbol.idx <= num.right + 1
+      ).for_each(|num| numbers.push(num));
+    }
+
+    if numbers.len() == 2 {
+      sum + numbers.iter().map(|num| num.value).product::<u32>() 
+    } else { sum }
+  });
+
+  println!("{result1}{result2}");
 }

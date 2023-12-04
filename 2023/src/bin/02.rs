@@ -59,5 +59,5 @@ fn main() {
 
 
   println!("{:?}", timer.elapsed().unwrap());
-  println!("{result2}");
+  println!("{result1} {result2}");
 }

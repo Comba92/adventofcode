@@ -1,5 +1,4 @@
-use std::{collections::HashSet, fs};
-
+use std::collections::HashSet;
 
 fn recursion(card: usize, matches: &Vec<usize>) -> usize {
   if card >= matches.len() { return 0 }
@@ -16,7 +15,6 @@ fn recursion(card: usize, matches: &Vec<usize>) -> usize {
 
 fn main() {
   let input = include_str!("04.txt");
-  let input = fs::read_to_string("C:\\Users\\Comba\\Desktop\\HxE7.txt\\bigboy.txt").unwrap();
 
   let mut matches_per_card = Vec::new();
   let timer = std::time::SystemTime::now();
@@ -55,5 +53,5 @@ fn main() {
     );
 
   println!("{:?}", timer.elapsed().unwrap());
-  println!("{result2}");
+  println!("{result1} {result2}");
 }
