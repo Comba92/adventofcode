@@ -59,7 +59,7 @@ fn main() {
  
       probable_row.unwrap().iter_mut()
       .filter(|num| 
-        !num.visited && num.left - 1 <= symbol.idx && symbol.idx <= num.right + 1
+        !num.visited && (num.left - 1 ..= num.right + 1).contains(&symbol.idx)
       ).for_each(|num| {
         num.visited = true;
         row_sum += num.value
@@ -80,7 +80,7 @@ fn main() {
  
       probable_row.unwrap().iter()
       .filter(|num| 
-        num.left - 1 <= symbol.idx && symbol.idx <= num.right + 1
+        (num.left - 1 ..= num.right + 1).contains(&symbol.idx)
       ).for_each(|num| numbers.push(num));
     }
 
@@ -89,5 +89,5 @@ fn main() {
     } else { sum }
   });
 
-  println!("{result1}{result2}");
+  println!("{result1} {result2}");
 }

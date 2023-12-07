@@ -1,4 +1,4 @@
-use std::collections::{HashSet, HashMap};
+use std::{collections::{HashSet, HashMap}, fs};
 
 fn recursion(card: usize, matches: &Vec<usize>, memo: &mut HashMap<usize, usize>) -> usize {
   if card >= matches.len() { return 0 }
@@ -8,7 +8,7 @@ fn recursion(card: usize, matches: &Vec<usize>, memo: &mut HashMap<usize, usize>
 
   for next in 1..=this_match {
     if let Some(cached) = memo.get(&(card + next)) {
-      sum += recursion(card + next, matches, memo)
+      sum += cached
     } else {
       let rec = recursion(card + next, matches, memo);
       memo.insert(card + next, rec);
@@ -25,8 +25,8 @@ fn main() {
   let mut matches_per_card = Vec::new();
   let timer = std::time::SystemTime::now();
 
-  let result1 = input.lines().fold(0, |total_sum, line| {
-    let row = line
+  let cards = input.lines().map(|line| {
+    line
     .split(':').nth(1).unwrap()
     .split('|').map(|list| {
       list
@@ -34,13 +34,16 @@ fn main() {
       .filter(|token| !token.is_empty())
       .map(|token| token.parse::<u32>().unwrap())
       .collect::<Vec<_>>()
-    }).collect::<Vec<_>>();
+    }).collect::<Vec<_>>()
+  });
 
+  
+  let result1 = cards.fold(0, |total_sum, card| {
     let mut winning = HashSet::new();
-    row[0].iter().for_each(|&num| { winning.insert(num); });
-
+    card[0].iter().for_each(|&num| { winning.insert(num); });
+  
     let mut row_matches = 0;
-    let row_score = row[1].iter().fold(0, |sum, num| {
+    let row_score = card[1].iter().fold(0, |sum, num| {
       if let Some(_) = winning.get(num) {
         row_matches += 1;
         if sum == 0 { 1 } else { sum * 2 }
@@ -51,7 +54,6 @@ fn main() {
 
     total_sum + row_score
   });
-
 
   let mut memoization: HashMap<usize, usize> = HashMap::new();
   let result2 = (0 .. matches_per_card.len())
