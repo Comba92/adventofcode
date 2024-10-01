@@ -1,6 +1,6 @@
 #[allow(dead_code)]
 
-fn fight_1(opponent: char, player: char) -> u32 {
+fn fight1((opponent, player): (char, char)) -> u32 {
   match (opponent, player) {
     ('A', 'X') => 3 + 1,
     ('A', 'Y') => 6 + 2,
@@ -15,7 +15,7 @@ fn fight_1(opponent: char, player: char) -> u32 {
   }
 }
 
-fn fight_2(opponent: char, player: char) -> u32 {
+fn fight2((opponent, player): (char, char)) -> u32 {
   match (opponent, player) {
     ('A', 'X') => 0 + 3,
     ('A', 'Y') => 3 + 1,
@@ -34,16 +34,19 @@ fn fight_2(opponent: char, player: char) -> u32 {
 fn main() {
   let input = String::from(include_str!("02.txt"));  
 
-  let result = input.lines().fold(0, |score, line| {
-    let moves: Vec<&str> = line.split(' ').collect();
-    
-    let opponent = moves[0].chars().nth(0).unwrap();
-    let player = moves[1].chars().nth(0).unwrap();
+  let rounds: Vec<(char, char)> = input.lines()
+  .map(|line| {
+    let moves: Vec<char> = line.chars().filter(|&c| c != ' ').collect();
+    (moves[0], moves[1])
+  }).collect();
 
-    let points = fight_2(opponent, player);
+  let result1: u32 = rounds.iter()
+    .map(|&round| fight1(round))
+    .sum();
 
-    score + points
-  });
+  let result2: u32 = rounds.iter()
+    .map(|&round| fight2(round))
+    .sum();
 
-  println!("{result}");
+  println!("{result1} {result2}");
 }

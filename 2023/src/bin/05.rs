@@ -102,7 +102,7 @@ fn main() {
   let result2 = seeds.as_slice().chunks_exact(2)
   .enumerate()
   .map(|(i, seed)| {
-    println!("{i} seeds solved in {:?}...", timer.elapsed());
+    println!("{i} seeds solved in {:?}...", timer.elapsed().unwrap());
     (seed[0] .. seed[0] + seed[1] - 1).map(|value| {
       let mut current = value;
   

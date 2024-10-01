@@ -1,54 +1,47 @@
 use std::collections::HashSet;
 
-fn get_priority(item: char) -> u32 {
+fn get_priority(item: &char) -> u32 {
   match item {
-    'a'..='z' => item as u32 - 'a' as u32 + 1,
-    'A'..='Z' => item as u32 - 'A' as u32 + 27,
+    'a'..='z' => *item as u32 - 'a' as u32 + 1,
+    'A'..='Z' => *item as u32 - 'A' as u32 + 27,
     _ => unreachable!()
   }
 } 
 
 fn main() {
   let input = include_str!("03.txt");
-
-  let result1 = input.lines().fold(0, |total_sum, line| { 
+  
+  let mut result1 = 0;
+  for line in input.lines() {
     let compartments = line.split_at(line.len() / 2);
-    
-    let mut compartment_maps = (HashSet::new(), HashSet::new());
-    compartments.0.chars().for_each(|c| { compartment_maps.0.insert(c); });
-    compartments.1.chars().for_each(|c| { compartment_maps.1.insert(c); });
 
-    let intersection = compartment_maps.0
-      .intersection(&compartment_maps.1);
+    let set1: HashSet<char> = HashSet::from_iter(compartments.0.chars());
+    let set2: HashSet<char> = HashSet::from_iter(compartments.1.chars());
+    let intersection = set1.intersection(&set2);
 
-    total_sum + intersection.fold(0, |sum, &item| {
-      sum + get_priority(item)
-    })
-  });
+    let sum: u32 = intersection.map(get_priority).sum();
+    result1 += sum;
+  }
 
 
   let mut result2 = 0;
-  let mut lines = input.lines().peekable();
-  while lines.peek().is_some() {
-    let mut group = lines.by_ref().take(3);
+  const GROUP_LEN: usize = 3;
+  let lines = input.lines().collect::<Vec<_>>();
 
-    let mut comp_set_1 = HashSet::new();
-    group.next().unwrap().chars().for_each(|c| { comp_set_1.insert(c); });
+  for group in lines.chunks(GROUP_LEN) {
+    let mut sets: Vec<HashSet<char>> = Vec::new();
 
-    let mut comp_set_2 = HashSet::new();
-    group.next().unwrap().chars().for_each(|c| { comp_set_2.insert(c); });
+    for line in group {
+      let set: HashSet<char> = HashSet::from_iter(line.chars());
+      sets.push(set);
+    }
 
-    let mut comp_set_3 = HashSet::new();
-    group.next().unwrap().chars().for_each(|c| { comp_set_3.insert(c); });
+    // This computes the intersection of n sets. Smart!
+    let sum: u32 = sets[0].iter()
+    .filter(|c| sets.iter().all(|set| set.contains(c)))
+    .map(get_priority).sum();
 
-    let intersection = comp_set_1
-      .intersection(&comp_set_2)
-      .map(|&c| c)
-      .collect::<HashSet<_>>();
-
-    result2 += intersection.intersection(&comp_set_3).fold(0, |sum, &item| {
-      sum + get_priority(item)
-    })
+    result2 += sum;
   }
 
   println!("{result1} {result2}");

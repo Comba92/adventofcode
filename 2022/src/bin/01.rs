@@ -1,25 +1,22 @@
 use std::collections::BinaryHeap;
-use std::cmp::Reverse;
 
 fn main() {
   let input = String::from(include_str!("01.txt"));
 
-  let mut heap: BinaryHeap<Reverse<i32>> = BinaryHeap::with_capacity(4);
+  let mut heap: BinaryHeap<u32> = BinaryHeap::new();
 
-  input.split("\r\n\r\n")
-    .for_each(|group| {
-      let sum = group.lines()
-        .fold(0, |sum, item| {
-          sum + item.parse::<i32>().unwrap()
-        });
+  let groups = input.split("\r\n\r\n");
 
-      heap.push(Reverse(sum));
-      if heap.len() == 4 {
-        heap.pop();
-      }
-    });
+  for group in groups {
+    let sum = group.lines()
+      .map(|item| item.parse::<u32>().unwrap())
+      .sum();
+
+    heap.push(sum);
+  }
   
-
-  let result: i32 = heap.iter().fold(0, |sum, rev| sum + rev.0);
-  println!("{result}");
+  let result1 = heap.peek().unwrap().to_owned();
+  let result2: u32 = heap.into_sorted_vec().iter().rev().take(3).sum();
+  
+  println!("{result1} {result2}");
 }

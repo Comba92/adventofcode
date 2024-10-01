@@ -1,5 +1,3 @@
-#![allow(dead_code, unused)]
-
 fn count_and_color_to_tuple(s: &str) -> (usize, &str) {
   let mut group = s
   .split(' ')
