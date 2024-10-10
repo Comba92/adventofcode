@@ -1,14 +1,14 @@
 use std::collections::HashSet;
 
-const DIRECTIONS: [(i32, i32); 4] = [
-  (-1, 0), (1, 0), (0, -1), (0, 1)
-];
+use utils::vector::{Vector, DIRECTIONS};
+
+mod utils;
 
 fn dfs1(
   grid: &Vec<Vec<u32>>, 
-  first: u32, current: (i32, i32), 
-  direction: (i32, i32),
-  visited: &mut HashSet<(i32, i32)>
+  first: u32, current: Vector, 
+  direction: Vector,
+  visited: &mut HashSet<Vector>
 ) -> bool 
 {
   visited.insert(current);

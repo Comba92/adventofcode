@@ -1,11 +1,6 @@
-type Vector = (i32, i32);
-const LEFT: Vector = (-1, 0);
-const RIGHT: Vector = (1, 0);
+mod utils;
+use utils::vector::{vec_add, Vector, LEFT, RIGHT};
 const DOWN: Vector = (0, -1);
-
-fn vec_add(a: Vector, b: Vector) -> Vector {
-  (a.0 + b.0, a.1 + b.1)
-}
 
 struct RockKind {
   blocks: &'static [Vector],

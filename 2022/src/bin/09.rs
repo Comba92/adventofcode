@@ -1,14 +1,8 @@
 use std::collections::HashSet;
 
-type Vector = (i32, i32);
-const LEFT: Vector = (-1, 0);
-const RIGHT: Vector = (1, 0);
-const UP: Vector = (0, -1);
-const DOWN: Vector = (0, 1);
+mod utils;
+use utils::vector::{vec_add, Vector, DOWN, LEFT, RIGHT, UP};
 
-fn vec_add(vec1: Vector, vec2: Vector) -> Vector {
-  (vec1.0 + vec2.0, vec1.1 + vec2.1)
-}
 
 const MIN_DIST: i32 = 2;
 const KNOTS1: usize = 2;

@@ -8,7 +8,7 @@ struct Cpu {
 impl Cpu {
   fn tick_and_check(&mut self, sum: &mut i32) {
     let row = self.cycle / 40;
-    let col = (self.cycle % 40);
+    let col = self.cycle % 40;
 
     if (self.x-1 ..= self.x+1).contains(&(col as i32)) {
       self.crt[row][col] = true;
