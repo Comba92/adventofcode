@@ -3,26 +3,26 @@ use std::collections::{HashMap, HashSet};
 fn main() {
   let input = include_str!("23.txt");
 
-  let mut map: HashMap<&str, HashSet<&str>> = HashMap::new();
+  let mut links: HashMap<&str, HashSet<&str>> = HashMap::new();
   for line in input.lines() {
     let pair = line
       .split_once('-').unwrap();
     
-    map.entry(pair.0)
+    links.entry(pair.0)
       .and_modify(|e| { e.insert(pair.1); })
       .or_insert(HashSet::from([pair.1]));
 
-    map.entry(pair.1)
+    links.entry(pair.1)
       .and_modify(|e| { e.insert(pair.0); })
       .or_insert(HashSet::from([pair.0]));
   }
 
-  println!("{map:#?}");
+  // println!("{map:#?}");
   let mut triples= HashSet::new();
   
-  for (upper, set) in &map {
+  for (upper, set) in &links {
     for lower in set {
-      let intersection = map[lower]
+      let intersection = links[lower]
         .intersection(set);
       
       for third in intersection {
@@ -37,6 +37,56 @@ fn main() {
     .filter(|t| t.iter().any(|x| x.starts_with('t')))
     .count();
 
-  // println!("{triples:?}");
   println!("{res1}");
+    
+  let max_degree = links.values()
+    .map(|v| v.len())
+    .max().unwrap();
+
+  for clique_nodes in (0..=max_degree).rev() {
+    if let Some(res2) = find_k_clique(&links, clique_nodes) {
+      println!("{res2}");
+      break;
+    }
+  }
+}
+
+fn find_k_clique(links: &HashMap<&str, HashSet<&str>>, clique_nodes: usize) -> Option<String> {
+  for (upper, set) in links {
+    for lower in set {
+      let intersection = links[lower]
+        .intersection(set);
+
+      // intersection excludes upper and lower
+      // let subgraph_nodes = 1 + intersection.clone().count();
+      // if subgraph_nodes != clique_nodes { continue; }
+
+      let nodes_iter = intersection.clone()
+        .zip(intersection.clone());
+    
+      let mut is_clique = true;
+      for (&v, &w) in nodes_iter {
+        if v == w { continue; }
+        if !links[v].contains(w) { 
+          is_clique = false;
+          break;
+        }
+      }
+
+      if is_clique {
+        let mut clique = intersection
+          .map(|s| *s)
+          .collect::<Vec<_>>();
+
+        clique.push(upper);
+        clique.push(lower);
+        clique.sort();
+
+        let res = clique.join(",");
+        return Some(res);
+      }
+    }
+  }
+
+  return None;
 }
