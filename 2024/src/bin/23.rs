@@ -39,9 +39,11 @@ fn main() {
 
   println!("{res1}");
     
+  
   let max_degree = links.values()
     .map(|v| v.len())
-    .max().unwrap();
+    .max().unwrap() + 1;
+  // add 1 as the key is not included in set
 
   for clique_nodes in (0..=max_degree).rev() {
     if let Some(res2) = find_k_clique(&links, clique_nodes) {
@@ -58,18 +60,17 @@ fn find_k_clique(links: &HashMap<&str, HashSet<&str>>, clique_nodes: usize) -> O
         .intersection(set);
 
       // intersection excludes upper and lower
-      // let subgraph_nodes = 1 + intersection.clone().count();
-      // if subgraph_nodes != clique_nodes { continue; }
-
-      let nodes_iter = intersection.clone()
-        .zip(intersection.clone());
+      let subgraph_nodes = 2 + intersection.clone().count();
+      if subgraph_nodes != clique_nodes { continue; }
     
       let mut is_clique = true;
-      for (&v, &w) in nodes_iter {
-        if v == w { continue; }
-        if !links[v].contains(w) { 
-          is_clique = false;
-          break;
+      for &v in intersection.clone() {
+        for &w in intersection.clone() {
+          if v == w { continue; }
+          if !links[v].contains(w) {
+            is_clique = false;
+            break;
+          }
         }
       }
 
