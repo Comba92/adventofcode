@@ -63,7 +63,6 @@ fn dfs_single_direction(
   }
 }
 
-// 2097 - too high
 fn mas_cross(
   matrix: &Vec<Vec<char>>,
   x: usize, y: usize,
