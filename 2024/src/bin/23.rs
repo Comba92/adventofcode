@@ -9,12 +9,10 @@ fn main() {
       .split_once('-').unwrap();
     
     links.entry(pair.0)
-      .and_modify(|e| { e.insert(pair.1); })
-      .or_insert(HashSet::from([pair.1]));
+      .or_default().insert(pair.1);
 
     links.entry(pair.1)
-      .and_modify(|e| { e.insert(pair.0); })
-      .or_insert(HashSet::from([pair.0]));
+      .or_default().insert(pair.0);
   }
 
   // println!("{map:#?}");

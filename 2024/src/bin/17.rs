@@ -129,6 +129,8 @@ fn main() {
   let res1 = emu.run(&program);
   println!("{res1}");
 
+  // https://github.com/rene-d/advent-of-rust/blob/e085ae984972fe01ec024e22c93baec7f46eef92/src/year2024/day17/day17.rs#L153
+  
   // 'search: for i in 0.. {
   //   emu = Emulator { a: i, b, c, ip: 0 };
   //   let mut op_count = 0;
