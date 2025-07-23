@@ -6,7 +6,8 @@ fn main() {
   .map(|line| line.split_once(':').unwrap())
   .map(|pair| {
     let res = pair.0.parse::<u64>().unwrap();
-    let nums = pair.1.split_whitespace().map(|n| n.parse::<u64>().unwrap()).collect::<Vec<_>>();
+    let nums = pair.1.split_whitespace()
+      .map(|n| n.parse::<u64>().unwrap()).collect::<Vec<_>>();
 
     (res, nums)
   });
@@ -16,8 +17,9 @@ fn main() {
   for eq in equations {
     if find_solution1(&eq.1[1..], eq.1[0], eq.0) {
       res1 += eq.0;
-      res2 += eq.0;
-    } else if find_solution2(&eq.1[1..], eq.1[0], eq.0) {
+    } 
+    
+    if find_solution2(&eq.1[1..], eq.1[0], eq.0) {
       res2 += eq.0;
     }
   }
@@ -27,11 +29,7 @@ fn main() {
 }
 
 fn find_solution1(nums: &[u64], curr: u64, target: u64) -> bool {
-  if curr == target {
-    return true;
-  } else if nums.is_empty() {
-    return false;
-  }
+  if nums.is_empty() { return curr == target; }
 
   if find_solution1(&nums[1..], curr + nums[0], target) {
     return true;
@@ -44,13 +42,8 @@ fn find_solution1(nums: &[u64], curr: u64, target: u64) -> bool {
   return false;
 }
 
-// 249943303573988 - too high
 fn find_solution2(nums: &[u64], curr: u64, target: u64) -> bool {
-  if curr == target {
-    return true;
-  } else if nums.is_empty() {
-    return false;
-  }
+  if nums.is_empty() { return curr == target; }
 
   if find_solution2(&nums[1..], curr + nums[0], target) {
     return true;

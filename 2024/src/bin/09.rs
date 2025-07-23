@@ -5,6 +5,7 @@ fn main() {
   let mut decoded1 = Vec::new();
 
   let mut file_blocks = Vec::new();
+  // key: block size, val: set of blocks idx start with that size
   let mut free_blocks = BTreeMap::new();
   
   for (i, c) in input.char_indices() {
@@ -29,6 +30,7 @@ fn main() {
   let mut decoded2 = decoded1.clone();
 
   let mut right = decoded1.len()-1;
+  // skip all empty blocks to the right
   while decoded1[right] == -1 { right -= 1; }
 
   for left in 0..decoded1.len() {
