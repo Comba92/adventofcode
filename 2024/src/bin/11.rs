@@ -2,6 +2,7 @@ use std::{collections::HashMap, hash::Hash, ops::Mul};
 
 fn main() {
   let input = include_str!("11.txt");
+  naive(input);
   smart(input);
 }
 
@@ -39,7 +40,7 @@ fn smart(input: &str) {
     stones = curr;
   }
 
-  let res = stones.values().copied().sum::<usize>();
+  let res = stones.values().sum::<usize>();
   println!("{res}");
 }
 
