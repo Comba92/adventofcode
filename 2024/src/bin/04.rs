@@ -1,3 +1,5 @@
+use aoc2024::DIRECTIONS_DIAG;
+
 fn main() {
   let input = include_str!("04.txt");
 
@@ -6,17 +8,6 @@ fn main() {
     .map(|line| line.chars().collect::<Vec<_>>())
     .collect::<Vec<_>>();
 
-  const DIRECTIONS: &[(isize, isize)] = &[
-    (-1, -1),
-    (0, -1),
-    (1, -1),
-    (-1, 0),
-    (1, 0),
-    (-1, 1),
-    (0, 1),
-    (1, 1),
-  ];
-
   let mut res1 = 0;
   let mut res2 = 0;
   for (y, row) in matrix.iter().enumerate() {
@@ -24,7 +15,7 @@ fn main() {
       if *c == 'X' {
         let pos = (x as isize, y as isize);
 
-        for direction in DIRECTIONS {
+        for direction in DIRECTIONS_DIAG {
           if dfs_single_direction(&matrix, "MAS", pos, *direction) {
             res1 += 1;
           }

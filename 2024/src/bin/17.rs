@@ -1,5 +1,3 @@
-use std::u32;
-
 #[derive(Debug)]
 struct Emulator {
   a: u64,
@@ -116,11 +114,6 @@ fn main() {
     .split(',')
     .map(|c| c.parse::<u8>().unwrap())
     .collect::<Vec<_>>();
-
-  let program_str = program.iter()
-    .map(|n| n.to_string())
-    .collect::<Vec<_>>()
-    .join(",");
 
   println!("{a} {b} {c}");
   println!("{program:?}");

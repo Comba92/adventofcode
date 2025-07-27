@@ -1,6 +1,23 @@
 use std::ops::{Index, IndexMut};
 
 pub type Coordinate = (isize, isize);
+pub const DIRECTIONS: &[(isize, isize)] = &[
+  (0, -1),
+  (-1, 0),
+  (1, 0),
+  (0, 1),
+];
+
+pub const DIRECTIONS_DIAG: &[(isize, isize)] = &[
+  (-1, -1),
+  (0, -1),
+  (1, -1),
+  (-1, 0),
+  (1, 0),
+  (-1, 1),
+  (0, 1),
+  (1, 1),
+];
 
 pub struct Vec2D {
   x: isize,
@@ -29,7 +46,8 @@ pub fn coord_sub(a: &Coordinate, b: &Coordinate) -> Coordinate {
   (a.0 - b.0, a.1 - b.1)
 }
 
-#[derive(PartialEq, Eq, Default)]
+
+#[derive(PartialEq, Eq, Default, Clone)]
 pub struct Grid<T: Default> {
   data: Vec<T>,
   pub width: usize,
@@ -50,13 +68,15 @@ impl<T: std::fmt::Debug + Default> std::fmt::Debug for Grid<T> {
 
 impl<T: std::fmt::Display + Default> std::fmt::Display for Grid<T> {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    for row in self.iter_rows() {
+    writeln!(f, "\t{}", (0..self.width).map(|n| n.to_string()).collect::<String>())?;
+    
+    for (i, row) in self.iter_rows().enumerate() {
       let row_str = row.iter()
         .map(|c| c.to_string())
         .collect::<Vec<String>>()
         .join("");
 
-      writeln!(f, "{row_str}")?;
+      writeln!(f, "{i}\t{row_str}")?;
     }
 
     std::fmt::Result::Ok(())
@@ -83,6 +103,11 @@ impl<T: Default + Clone> Grid<T> {
 impl<T: Default> Grid<T> {
   pub fn pos_is_in_bounds(&self, (x, y): Coordinate) -> bool {
     x >= 0 && y >= 0 && x < self.width as isize && y < self.height as isize
+  }
+
+  pub fn pos_to_idx(&self, c: Coordinate) -> Option<usize> {
+    if !self.pos_is_in_bounds(c) { None }
+    else { Some(c.1 as usize * self.width + c.0 as usize) }
   }
 
   pub fn get(&self, pos: Coordinate) -> Option<&T> {
@@ -132,16 +157,15 @@ impl<T: Default> Grid<T> {
 
   pub fn iter_coords(&self) -> impl Iterator<Item = (Coordinate, &T)> {
     self.iter().enumerate().map(|(i, v)| 
-      (((i % self.width) as isize, (i / self.height) as isize), v)
+      (((i % self.width) as isize, (i / self.width) as isize), v)
     )
   }
 
   pub fn iter_coords_mut(&mut self) -> impl Iterator<Item = (Coordinate, &mut T)> { 
     let width = self.width;
-    let height = self.height;
     
     self.iter_mut().enumerate().map(move |(i, v)| {
-      (((i % width) as isize, (i / height) as isize), v)
+      (((i % width) as isize, (i / width) as isize), v)
     })
   }
 }
@@ -170,7 +194,7 @@ impl From<&str> for Grid<char> {
 
 impl<T: Clone + Default> From<&[&[T]]> for Grid<T> {
   fn from(value: &[&[T]]) -> Self {
-    let width = value.first().map(|f| f.len()).unwrap_or_default();
+    let width = value.first().map(|f| f.len()).expect("grid should not be empty");
     assert!(value.iter().all(|row| row.len() == width), "can't initialize grid: not all rows have a width equal to {width}");
 
     Self {
@@ -183,7 +207,7 @@ impl<T: Clone + Default> From<&[&[T]]> for Grid<T> {
 
 impl<T: Clone + Default> From<&[Vec<T>]> for Grid<T> {
   fn from(value: &[Vec<T>]) -> Self {
-    let width = value.first().map(|f| f.len()).unwrap_or_default();
+    let width = value.first().map(|f| f.len()).expect("grid should not be empty");
     assert!(value.iter().all(|row| row.len() == width), "can't initialize grid: not all rows have a width equal to {width}");
     
     Self {
@@ -196,7 +220,7 @@ impl<T: Clone + Default> From<&[Vec<T>]> for Grid<T> {
 
 impl<T: Clone + Default> From<&mut [Vec<T>]> for Grid<T> {
   fn from(value: &mut [Vec<T>]) -> Self {
-    let width = value.first().map(|f| f.len()).unwrap_or_default();
+    let width = value.first().map(|f| f.len()).expect("grid should not be empty");
     assert!(value.iter().all(|row| row.len() <= width), "can't initialize grid: not all rows have a width equal or less than {width}");
 
     value.iter_mut()
@@ -238,12 +262,7 @@ where
   fn from_iter<F: IntoIterator<Item = I>>(iter: F) -> Self {
     let mut iter = iter.into_iter();
 
-    let first_row = iter.next();
-    if first_row.is_none() {
-      return Self::default();
-    }
-    let first_row = first_row.unwrap();
-
+    let first_row = iter.next().expect("grid should not be empty");
     let width = first_row.clone().count();
     let mut data = Vec::from_iter(first_row);
 
