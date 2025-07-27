@@ -22,18 +22,21 @@ impl From<(isize, isize)> for Vec2D {
   }
 }
 
-pub fn coord_add(a: Coordinate, b: Coordinate) -> Coordinate {
+pub fn coord_add(a: &Coordinate, b: &Coordinate) -> Coordinate {
   (a.0 + b.0, a.1 + b.1)
 }
+pub fn coord_sub(a: &Coordinate, b: &Coordinate) -> Coordinate {
+  (a.0 - b.0, a.1 - b.1)
+}
 
-#[derive(PartialEq, Eq)]
-pub struct Grid<T> {
-  data: Box<[T]>,
+#[derive(PartialEq, Eq, Default)]
+pub struct Grid<T: Default> {
+  data: Vec<T>,
   pub width: usize,
   pub height: usize,
 }
 
-impl<T: std::fmt::Debug> std::fmt::Debug for Grid<T> {
+impl<T: std::fmt::Debug + Default> std::fmt::Debug for Grid<T> {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     let mut res = f.debug_list();
 
@@ -45,29 +48,39 @@ impl<T: std::fmt::Debug> std::fmt::Debug for Grid<T> {
   }
 }
 
-impl<T: Clone> Grid<T> {
-  pub fn resize(width: usize, height: usize, value: T) -> Self {
-    Self {
-      data: vec![value; width * height].into_boxed_slice(),
-      width, height
+impl<T: std::fmt::Display + Default> std::fmt::Display for Grid<T> {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    for row in self.iter_rows() {
+      let row_str = row.iter()
+        .map(|c| c.to_string())
+        .collect::<Vec<String>>()
+        .join("");
+
+      writeln!(f, "{row_str}")?;
     }
+
+    std::fmt::Result::Ok(())
   }
 }
 
 impl<T: Default + Clone> Grid<T> {
-  pub fn reserve(width: usize, height: usize) -> Self {
+  pub fn new(width: usize, height: usize) -> Self {
     Self {
-      data: vec![Default::default(); width * height].into_boxed_slice(),
+      data: vec![Default::default(); width * height],
       width, height
     }
   }
 
-  pub fn new(width: usize, height: usize) -> Self {
-    Self::reserve(width, height)
+  pub fn push_row(&mut self) {
+    self.data.resize(self.data.len() + self.width, T::default());
+  }
+
+  pub fn resize(&mut self, height: usize, value: T) {
+    self.data.resize(self.width * height, value);
   }
 }
 
-impl<T> Grid<T> {
+impl<T: Default> Grid<T> {
   pub fn pos_is_in_bounds(&self, (x, y): Coordinate) -> bool {
     x >= 0 && y >= 0 && x < self.width as isize && y < self.height as isize
   }
@@ -95,6 +108,10 @@ impl<T> Grid<T> {
     } else {
       false
     }
+  }
+
+  pub fn pop_row(&mut self) {
+    self.data.truncate(self.data.len() - self.width);
   }
 
   pub fn iter(&self) -> impl Iterator<Item = &T> {
@@ -129,7 +146,7 @@ impl<T> Grid<T> {
   }
 }
 
-impl<T> Index<Coordinate> for Grid<T> {
+impl<T: Default> Index<Coordinate> for Grid<T> {
   type Output = T;
 
   fn index(&self, (x, y): Coordinate) -> &Self::Output {
@@ -138,33 +155,39 @@ impl<T> Index<Coordinate> for Grid<T> {
   }
 }
 
-impl<T> IndexMut<Coordinate> for Grid<T> {
+impl<T: Default> IndexMut<Coordinate> for Grid<T> {
   fn index_mut(&mut self, (x, y): Coordinate) -> &mut Self::Output {
     let idx = y * self.width as isize + x;
     &mut self.data[idx as usize]
   }
 }
 
-impl<T: Clone> From<&[&[T]]> for Grid<T> {
+impl From<&str> for Grid<char> {
+  fn from(value: &str) -> Self {
+    value.lines().map(|line| line.chars()).collect()
+  }
+}
+
+impl<T: Clone + Default> From<&[&[T]]> for Grid<T> {
   fn from(value: &[&[T]]) -> Self {
     let width = value.first().map(|f| f.len()).unwrap_or_default();
     assert!(value.iter().all(|row| row.len() == width), "can't initialize grid: not all rows have a width equal to {width}");
 
     Self {
-      data: value.concat().into_boxed_slice(),
+      data: value.concat(),
       width,
       height: value.len(),
     }
   }
 }
 
-impl<T: Clone> From<&[Vec<T>]> for Grid<T> {
+impl<T: Clone + Default> From<&[Vec<T>]> for Grid<T> {
   fn from(value: &[Vec<T>]) -> Self {
     let width = value.first().map(|f| f.len()).unwrap_or_default();
     assert!(value.iter().all(|row| row.len() == width), "can't initialize grid: not all rows have a width equal to {width}");
     
     Self {
-      data: value.concat().into_boxed_slice(),
+      data: value.concat(),
       width,
       height: value.len(),
     }
@@ -180,42 +203,47 @@ impl<T: Clone + Default> From<&mut [Vec<T>]> for Grid<T> {
       .for_each(|row| row.resize(width, T::default()));
 
     Self {
-      data: value.concat().into_boxed_slice(),
+      data: value.concat(),
       width,
       height: value.len(),
     }
   }
 }
 
-impl<T: Clone> From<&Vec<Vec<T>>> for Grid<T> {
+impl<T: Clone + Default> From<&Vec<Vec<T>>> for Grid<T> {
   fn from(value: &Vec<Vec<T>>) -> Self {
     Self::from(value.as_slice())
   }
 }
 
-impl<T: Clone> From<&mut Vec<Vec<T>>> for Grid<T> {
+impl<T: Clone + Default> From<&mut Vec<Vec<T>>> for Grid<T> {
   fn from(value: &mut Vec<Vec<T>>) -> Self {
     Self::from(value.as_slice())
   }
 }
 
-impl<T> IntoIterator for Grid<T> {
+impl<T: Default> IntoIterator for Grid<T> {
   type Item = T;
   type IntoIter = std::vec::IntoIter<T>;
 
   fn into_iter(self) -> Self::IntoIter {
-    self.data.into_vec().into_iter()
+    self.data.into_iter()
   }
 }
 
-impl<T, I> FromIterator<I> for Grid<T>
+impl<T: Default, I> FromIterator<I> for Grid<T>
 where 
   I: Iterator<Item = T> + Clone,
 {
   fn from_iter<F: IntoIterator<Item = I>>(iter: F) -> Self {
     let mut iter = iter.into_iter();
 
-    let first_row = iter.next().unwrap();
+    let first_row = iter.next();
+    if first_row.is_none() {
+      return Self::default();
+    }
+    let first_row = first_row.unwrap();
+
     let width = first_row.clone().count();
     let mut data = Vec::from_iter(first_row);
 
@@ -226,14 +254,14 @@ where
 
     let len = data.len();
     Self {
-      data: data.into_boxed_slice(),
+      data: data,
       width,
       height: len / width
     }
   }
 }
 
-// impl<T> FromIterator<Vec<T>> for Grid<T> {
+// impl<T: Default> FromIterator<Vec<T>> for Grid<T> {
 //   fn from_iter<I: IntoIterator<Item = Vec<T>>>(iter: I) -> Self {
 //     let mut iter = iter.into_iter();
 
@@ -248,7 +276,7 @@ where
 
 //     let len = data.len();
 //     Self {
-//       data: data.into_boxed_slice(),
+//       data: data,
 //       width,
 //       height: len / width
 //     }

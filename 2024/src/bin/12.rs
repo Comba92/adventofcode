@@ -7,7 +7,7 @@ fn main() {
   
   let grid = input
     .lines()
-    .map(|line| line.chars().collect::<Vec<_>>())
+    .map(|line| line.chars())
     .collect::<Grid<_>>();
 
   let mut visited_total = HashSet::new();
