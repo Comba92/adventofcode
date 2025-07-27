@@ -45,11 +45,14 @@ pub fn coord_add(a: &Coordinate, b: &Coordinate) -> Coordinate {
 pub fn coord_sub(a: &Coordinate, b: &Coordinate) -> Coordinate {
   (a.0 - b.0, a.1 - b.1)
 }
+pub fn coord_mul(c: &Coordinate, s: isize) -> Coordinate {
+  (c.0 * s, c.1 * s)
+}
 
 
 #[derive(PartialEq, Eq, Default, Clone)]
 pub struct Grid<T: Default> {
-  data: Vec<T>,
+  pub data: Vec<T>,
   pub width: usize,
   pub height: usize,
 }
@@ -105,9 +108,24 @@ impl<T: Default> Grid<T> {
     x >= 0 && y >= 0 && x < self.width as isize && y < self.height as isize
   }
 
+  fn pos_to_idx_unchecked(&self, (x, y): Coordinate) -> usize {
+    y as usize * self.width + x as usize
+  }
+
   pub fn pos_to_idx(&self, c: Coordinate) -> Option<usize> {
     if !self.pos_is_in_bounds(c) { None }
-    else { Some(c.1 as usize * self.width + c.0 as usize) }
+    else { Some(self.pos_to_idx_unchecked(c)) }
+  }
+
+  fn idx_to_pos_unchecked(&self, i: usize) -> Coordinate {
+    ((i % self.width) as isize, (i / self.width) as isize)
+  }
+
+  pub fn idx_to_pos(&self, i: usize) -> Option<Coordinate> {
+    if i >= self.data.len() { None }
+    else {
+      Some(self.idx_to_pos_unchecked(i))
+    }
   }
 
   pub fn get(&self, pos: Coordinate) -> Option<&T> {
@@ -157,7 +175,7 @@ impl<T: Default> Grid<T> {
 
   pub fn iter_coords(&self) -> impl Iterator<Item = (Coordinate, &T)> {
     self.iter().enumerate().map(|(i, v)| 
-      (((i % self.width) as isize, (i / self.width) as isize), v)
+      (self.idx_to_pos_unchecked(i), v)
     )
   }
 
@@ -173,16 +191,15 @@ impl<T: Default> Grid<T> {
 impl<T: Default> Index<Coordinate> for Grid<T> {
   type Output = T;
 
-  fn index(&self, (x, y): Coordinate) -> &Self::Output {
-    let idx = y * self.width as isize + x;
-    &self.data[idx as usize]
+  fn index(&self, c: Coordinate) -> &Self::Output {
+    &self.data[self.pos_to_idx_unchecked(c)]
   }
 }
 
 impl<T: Default> IndexMut<Coordinate> for Grid<T> {
-  fn index_mut(&mut self, (x, y): Coordinate) -> &mut Self::Output {
-    let idx = y * self.width as isize + x;
-    &mut self.data[idx as usize]
+  fn index_mut(&mut self, c: Coordinate) -> &mut Self::Output {
+    let idx = self.pos_to_idx_unchecked(c);
+    &mut self.data[idx]
   }
 }
 
