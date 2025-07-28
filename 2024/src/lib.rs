@@ -173,6 +173,11 @@ impl<T: Default> Grid<T> {
     self.data.chunks_exact_mut(self.width)
   }
 
+  pub fn iter_cols(&self) -> impl Iterator<Item = impl Iterator<Item = &T>> {
+    (0..self.width)
+      .map(|col| self.data[col..].iter().step_by(self.width))
+  }
+
   pub fn iter_coords(&self) -> impl Iterator<Item = (Coordinate, &T)> {
     self.iter().enumerate().map(|(i, v)| 
       (self.idx_to_pos_unchecked(i), v)
