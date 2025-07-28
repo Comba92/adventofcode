@@ -12,7 +12,7 @@ fn main() {
   for (pos, c) in grid.iter_coords() {
     if *c == '0' {
       let mut reached = HashSet::new();
-      res2 += dfs(&grid, pos, *c, &mut HashSet::new(), &mut reached);
+      res2 += dfs(&grid, &pos, *c, &mut HashSet::new(), &mut reached);
       res1 += reached.len();
     }
   }
@@ -23,7 +23,7 @@ fn main() {
 
 fn dfs(
   grid: &Grid<char>,
-  pos: Coordinate,
+  pos: &Coordinate,
   curr: char,
   branches: &mut HashSet<Coordinate>,
   reached: &mut HashSet<Coordinate>
@@ -39,7 +39,7 @@ fn dfs(
         reached.insert(next_pos);
         paths += 1;
       } else {
-        paths += dfs(grid, next_pos, (curr as u8 + 1) as char, branches, reached);
+        paths += dfs(grid, &next_pos, (curr as u8 + 1) as char, branches, reached);
       }
     }
   }

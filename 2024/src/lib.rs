@@ -196,9 +196,39 @@ impl<T: Default> Index<Coordinate> for Grid<T> {
   }
 }
 
+impl<T: Default> Index<&Coordinate> for Grid<T> {
+  type Output = T;
+
+  fn index(&self, c: &Coordinate) -> &Self::Output {
+    &self.data[self.pos_to_idx_unchecked(*c)]
+  }
+}
+
+impl<T: Default> Index<&mut Coordinate> for Grid<T> {
+  type Output = T;
+
+  fn index(&self, c: &mut Coordinate) -> &Self::Output {
+    &self.data[self.pos_to_idx_unchecked(*c)]
+  }
+}
+
 impl<T: Default> IndexMut<Coordinate> for Grid<T> {
   fn index_mut(&mut self, c: Coordinate) -> &mut Self::Output {
     let idx = self.pos_to_idx_unchecked(c);
+    &mut self.data[idx]
+  }
+}
+
+impl<T: Default> IndexMut<&Coordinate> for Grid<T> {
+  fn index_mut(&mut self, c: &Coordinate) -> &mut Self::Output {
+    let idx = self.pos_to_idx_unchecked(*c);
+    &mut self.data[idx]
+  }
+}
+
+impl<T: Default> IndexMut<&mut Coordinate> for Grid<T> {
+  fn index_mut(&mut self, c: &mut Coordinate) -> &mut Self::Output {
+    let idx = self.pos_to_idx_unchecked(*c);
     &mut self.data[idx]
   }
 }
