@@ -19,23 +19,86 @@ pub const DIRECTIONS_DIAG: &[(isize, isize)] = &[
   (1, 1),
 ];
 
-pub struct Vec2D {
-  x: isize,
-  y: isize,
-}
-impl Vec2D {
-  pub fn new(x: isize, y: isize) -> Self {
-    Self {x, y}
-  }
-
-  pub fn add(&self, other: &Self) -> Self {
-    Self::new(self.x + other.x, self.y + other.y)
-  }
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+pub enum Direction {
+  Up, Right, Down, Left, None
 }
 
-impl From<(isize, isize)> for Vec2D {
+impl From<Coordinate> for Direction {
   fn from(value: Coordinate) -> Self {
-    Self::new(value.0, value.1)
+    match value {
+      (0, ..=-1) => Self::Left,
+      (..=-1, 0) => Self::Up,
+      (1.., 0) => Self::Down,
+      (0, 1..) => Self::Right,
+      _ => Self::None,
+    }
+  }
+}
+
+impl From<char> for Direction {
+  fn from(value: char) -> Self {
+    match value {
+      '^' => Self::Up,
+      '>' => Self::Right,
+      'v' => Self::Down,
+      '<' => Self::Left,
+      _ => Self::None
+    }
+  }
+}
+
+impl From<u32> for Direction {
+  fn from(value: u32) -> Self {
+    match value {
+      0 => Self::Up,
+      1 => Self::Right,
+      2 => Self::Down,
+      3 => Self::Left,
+      _ => Self::None,
+    }
+  }
+}
+
+impl Direction {
+  pub fn to_vector(&self) -> Coordinate {
+    match self {
+      Self::Up    => (0, -1),
+      Self::Right => (1, 0),
+      Self::Down  => (0, 1),
+      Self::Left  => (-1, 0),
+      Self::None  => (0, 0),
+    }
+  }
+
+  pub fn to_char(&self) -> char {
+    match self {
+      Self::Up => '^',
+      Self::Right => '>',
+      Self::Down => 'v',
+      Self::Left => '<',
+      Self::None => ' ',
+    }
+  }
+
+  pub fn turn_left(&self) -> Direction {
+    match self {
+      Self::Up => Self::Left,
+      Self::Down => Self::Right,
+      Self::Left => Self::Down,
+      Self::Right => Self::Up,
+      Self::None => Self::None
+    }
+  }
+
+  pub fn turn_right(&self) -> Direction {
+    match self {
+      Self::Up => Self::Right,
+      Self::Down => Self::Left,
+      Self::Left => Self::Up,
+      Self::Right => Self::Down,
+      Self::None => Self::None
+    }
   }
 }
 

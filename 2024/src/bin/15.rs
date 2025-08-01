@@ -1,43 +1,4 @@
-use aoc2024::{coord_add, Coordinate, Grid};
-
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
-enum Direction {
-  Up, Right, Down, Left, None
-}
-
-impl From<char> for Direction {
-  fn from(value: char) -> Self {
-    match value {
-      '^' => Self::Up,
-      '>' => Self::Right,
-      'v' => Self::Down,
-      '<' => Self::Left,
-      _ => Self::None
-    }
-  }
-}
-
-impl Direction {
-  fn to_vector(&self) -> Coordinate {
-    match self {
-      Self::Up    => (0, -1),
-      Self::Right => (1, 0),
-      Self::Down  => (0, 1),
-      Self::Left  => (-1, 0),
-      Self::None  => (0, 0),
-    }
-  }
-
-  fn to_char(&self) -> char {
-    match self {
-      Self::Up => '^',
-      Self::Right => '>',
-      Self::Down => 'v',
-      Self::Left => '<',
-      Self::None => ' ',
-    }
-  }
-}
+use aoc2024::{coord_add, Coordinate, Direction, Grid};
 
 // 1571274 too high
 
